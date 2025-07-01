@@ -1,2 +1,2 @@
-\xpg@aux {}{english}
-\contentsline {section}{\numberline {1}Introduction}{2}{}%
+\xpg@aux {}{greek}
+\contentsline {section}{\numberline {1}Περιγραφή Συστήματος}{2}{}%

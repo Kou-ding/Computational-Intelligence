@@ -2,8 +2,8 @@
 
 % Languages and fonts
 \usepackage{polyglossia}
-\setdefaultlanguage{english}
-\setotherlanguage{greek}
+\setdefaultlanguage{greek}
+\setotherlanguage{english}
 \usepackage{fontspec}
 \renewcommand{\thesection}{\arabic{section}} % Begin sections from 1
 \setmainfont{Times New Roman} % Set main font to Times New Roman
@@ -17,28 +17,40 @@
 \usepackage{mathrsfs} % curly math letters
 \usepackage{amssymb} %more mathematical symbols
 
+% Miscellaneous
+\usepackage{parskip} % Remove paragraph indentation
+\usepackage{enumitem} % For custom itemizes
+
 \begin{document}
 
 \begin{titlepage}
 \begin{center}
-    \vspace*{3cm}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=1\textwidth]{figures/auth_logo.png}
+    \end{figure}
+
+    \vspace{1cm}
 
     \Huge
-    Assignment 1
+    \textbf{1η Εργασία}
 
     \vspace{2cm}
-    \LARGE
-    Computational Intelligence \\
-    Assignment 1 Report
+    
+    Υπολογιστική Νοημοσύνη \\
 
-    \vspace{4cm}
+    \vspace{2cm}
 
-    \textbf{Papadakis Konstantinos Fotios}
+    \Large
+    Παπαδάκης Κωνσταντίνος Φώτιος \\
+    ΑΕΜ: 10371
 
     \vfill
 
-    \Large
-    Date: \today
+    \large
+    Αριστοτέλειο Πανεπιστήμιο Θεσσαλονίκης \\
+    Τημήμα Ηλεκτρολόγων Μηχανικών και Μηχανικών Υπολογιστών \\
+    \today
 \end{center}
 \end{titlepage}
 
@@ -46,7 +58,46 @@
 
 \newpage
 
-\section{Introduction}
-This is the first assignment of the Computational Intelligence course. The goal is to familiarize ourselves with the
+\section{Περιγραφή Συστήματος}
+Επιλέγοντας ελεγκτή PI έχουμε:
+\begin{equation}
+    \label{eq:pi_controller}
+    G_c(s) = K_p \frac{K_i}{s} = \frac{K(s+c)}{s}
+\end{equation}
+
+Γνωρίζοντας ότι το σύστημα με τον κινητήρα μας είναι:
+\begin{equation}
+    \label{eq:closed_loop_system}
+    H(s) = \frac{K(s+c)}{(s+0.1)(s+10)}
+\end{equation}
+
+Η συνάρτηση μεταφοράς ανοικτού βρόγχου προκύπτει ως εξής:
+\begin{equation}
+    \label{eq:open_loop_transfer_function}
+    H(s)G_c(s) = A(s) = \frac{K(s+c)}{s(s+0.1)(s+10)}
+\end{equation}
+
+Καθώς έχουμε μοναδιαία αρνητική ανάδραση η συνάρτηση κλειστού βρόγχου μπορεί να υπολογιστεί από τη σχέση:
+\begin{equation}
+    \label{eq:closed_loop_transfer_function}
+    H_c(s) = \frac{A(s)}{1+A(s)} = \frac{K(s+c)}{s(s+0.1)(s+10) + K(s+c)}
+\end{equation} 
+
+Έχω δύο προδιαγραφές που πρέπει να ικανοποιούνται προκειμένου να επιλέξω τον σωστό ελεγκτή:
+\begin{enumerate}[label=(\alph*)]
+    \item Υπερύψωση για βηματική είσοδο  $<8\%$.
+    \item Χρόνος ανόδου $<0.6s$.
+\end{enumerate}
+
+Ο ΓΤΡ (Γεωμετρικός Τόπος Ριζών) του συστήματος είναι:
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{figures/root_locus.png}
+%     \caption{Γεωμετρικός Τόπος Ριζών Συστήματος}
+%     \label{fig:root_locus}
+% \end{figure}
+
+
+
 
 \end{document}

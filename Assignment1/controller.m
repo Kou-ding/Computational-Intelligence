@@ -1,26 +1,24 @@
 % Mark s as a transfer function variable
 s = tf('s');
 
-% Controlled plant
-H = 25 / ((s+0.1) * (s+10));
-% Controller
-%K = 4; % Gain
-c = 0.1; % Zero
-Gc = K*(s+c) / s;
-% Emerging System
-GcH = Gc*H;
+% Controller Parameters
+%K = 4; % Controller's Gain
+c = 0.1; % Controller's Zero
 
-% Plot the root locus of the closed loop system
+% Emerging System
+A = K*(s+c) / s*((s+0.1) * (s+10));
+
+% Plot the root locus of the open loop system
 figure;
-rlocus(GcH);
-title('Root Locus of GcH = Gc * H');
+rlocus(A);
+title('Root Locus of A = Gc * H');
 
 % Closed loop transfer function
-cloop = feedback(GcH, 1, -1);
+cloop = feedback(A, 1, -1);
 [z, p, k] = zpkdata(cloop, 'v');
 
 % Poles
-fprintf('Closed loop poles\n----------------\n');
+fprintf('Root Locus Poles\n----------------\n');
 for i = 1:length(p)
     if imag(p(i)) ~= 0
         fprintf('Pole %d: %.4f + %.4fi\n', i, real(p(i)), imag(p(i)));
@@ -30,7 +28,7 @@ for i = 1:length(p)
 end
 
 % Zeros
-fprintf('\nClosed loop zeros\n----------------\n');
+fprintf('\nRoot Locus Zeros\n----------------\n');
 for i = 1:length(z)
     if imag(z(i)) ~= 0
         fprintf('Zero %d: %.4f + %.4fi\n', i, real(z(i)), imag(z(i)));
@@ -40,5 +38,5 @@ for i = 1:length(z)
 end
 
 % Gain
-fprintf('\nClosed loop gain\n----------------\n');
+fprintf('\nRoot Locus Gain\n----------------\n');
 fprintf('Gain: %.4f\n', real(k(i)));

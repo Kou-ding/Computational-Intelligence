@@ -17,6 +17,7 @@
 \usepackage{mathrsfs} % curly math letters
 \usepackage{amssymb} %more mathematical symbols
 \usepackage{gensymb} % degree symbol
+\usepackage{mathtools} % For \mathclap
 
 % Miscellaneous
 \usepackage{parskip} % Remove paragraph indentation
@@ -64,13 +65,13 @@
 Επιλέγοντας ελεγκτή PI έχουμε:
 \begin{equation}
     \label{eq:pi_controller}
-    G_c(s) = K_p \frac{K_i}{s} = \frac{K(s+c)}{s}
+    G_c(s) = K_P + \frac{K_I}{s} = \frac{K_P \cdot s +K_I}{s} = \frac{K_P(s+\frac{K_I}{K_P})}{s} = \frac{K(s+c)}{s}
 \end{equation}
 
 Γνωρίζοντας ότι το σύστημα με τον κινητήρα μας είναι:
 \begin{equation}
     \label{eq:closed_loop_system}
-    H(s) = \frac{K(s+c)}{(s+0.1)(s+10)}
+    H(s) = \frac{25}{(s+0.1)(s+10)}
 \end{equation}
 
 Η συνάρτηση μεταφοράς ανοικτού βρόγχου προκύπτει ως εξής:
@@ -83,15 +84,32 @@
 \begin{equation}
     \label{eq:closed_loop_transfer_function}
     H_c(s) = \frac{A(s)}{1+A(s)} = \frac{K(s+c)}{s(s+0.1)(s+10) + K(s+c)}
-\end{equation} 
+\end{equation}
 
+Η βηματική ανάδραση του συστήματος κλειστού βρόγχου είναι:
+\begin{equation}
+    \label{eq:closed_loop_step_response}
+    Y(s) = H_c(s) \cdot X(s) = \frac{H_c(s)}{s} = \frac{K(s+c)}{s[s(s+0.1)(s+10) + K(s+c)]}
+\end{equation}
+
+\section{Επιλογή Ελεγκτή}
 Έχω δύο προδιαγραφές που πρέπει να ικανοποιούνται προκειμένου να επιλέξω τον σωστό ελεγκτή:
 \begin{enumerate}[label=(\alph*)]
     \item Υπερύψωση για βηματική είσοδο  $<8\%$.
     \item Χρόνος ανόδου $<0.6s$.
 \end{enumerate}
 
-Ο ΓΤΡ (Γεωμετρικός Τόπος Ριζών) της συνάρτησης μεταφοράς ανοικτού βρόγχου \ref{fig:root_locus} έχει δύο ασύμπτωτες ευθείες $90\degree$ και $-90\degree$ μοιρών.
+Μέσω της συνάρτησης \textbf{checkViability()} περνώ ως παράμετρο την συνάρτηση μεταφοράς κλειστού βρόγχου (Σχέση \ref{eq:closed_loop_system}) και αυτή ελέγχει τις παραπάνω συνθήκες. Η συνάρτηση \textbf{createViableckCSV()} από την άλλη, αξιοποιεί την \textbf{checkViability()} ανατρέχοντας στις διάφορες πιθανές τιμές που μπορούν να πάρουν τα K (φυσικοί αριθμοί από το 1 μέχρι το 100) και c (δεκαδικοί αριθμοί ενός ψηφίου υποδιαστολής από το -0.1 μέχρι το -10). Εν τέλει παράγει ένα αρχείο CSV με ικανά ζεύγη τιμών, από το οποίο επιλέγουμε αυθαίρετα το ζεύγος $(K, c)=(0.3, 30)$.
+
+Έτσι έχουμε:
+\begin{align*}
+    K = K_P &= 30 \\
+    c = \frac{K_I}{K_P} &= 0.3 \Rightarrow K_I = 9\\
+\end{align*}
+
+\section{Γεωμετρικός Τόπος Ριζών}
+\subsection{Απεικόνιση Matlab}
+Ο ΓΤΡ (Γεωμετρικός Τόπος Ριζών) της συνάρτησης μεταφοράς ανοικτού βρόγχου (Σχήμα \ref{fig:root_locus}) έχει δύο ασύμπτωτες ευθείες $90\degree$ και $-90\degree$ μοιρών.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/root_locus.png}
@@ -99,7 +117,84 @@
     \label{fig:root_locus}
 \end{figure}
 
+\subsection{Θεωρητική Ανάλυση}
+Πόλοι:  
+\begin{align*}
+    s(s+0.1)(s+10) &= 0 \\
+    s_1 &= 0 \\
+    s_2 &= -0.1 \\
+    s_3 &= -10 \\
+\end{align*}
 
+Μηδενικά:
+\begin{align*}
+    K(s+c) &= 0 \\
+    s &= -c = -0.3 \\
+\end{align*}
 
+Συνεπώς:
+\begin{align*}
+    \left.
+    \begin{aligned}
+        n &= \text{αριθμός πόλων} = 3 \\
+        m &= \text{αριθμός μηδενικών} = 1 
+    \end{aligned}
+    \quad
+    \right\}
+    \Rightarrow 
+    \quad
+    n-m = 2
+\end{align*}
 
+Ασύμπτωτες:
+\begin{align*} % * is used to omit numbering
+    \theta_i &= \frac{(2i+1)180\degree}{n-m} \\
+    \theta_0 &= \frac{(2 \cdot 0+1)180\degree}{2} = \frac{180\degree}{2} = 90\degree \\
+    \theta_1 &= \frac{(2 \cdot 1+1)180\degree}{2} = \frac{(3)180\degree}{2} = 270\degree \equiv -90\degree\\
+\end{align*}
+
+Σημείο τομής ασύμπτωτων με τον πραγματικό άξονα:
+\begin{align*}
+    \sigma_A &= \frac{\sum_{i=1}^{n} p_i - \sum_{i=1}^{m} z_i}{n-m} \\
+    \sigma_A &= \frac{0 + (-0.1) + (-10) - (-0.3)}{2} \\
+    \sigma_A &= \frac{-9.8}{2} \\
+    \sigma_A &= -4.9
+\end{align*}
+\section{Επιλογή Ασαφούς Ελεγκτή}
+
+Σημεία Σύγκλισης και Απόσχισης:
+\begin{align*}
+    H_p(s) &= \frac{s+0.3}{s(s+0.1)(s+10)} \\
+    \frac{dH_p(s)}{ds} &= 0 \\
+    0 &= \frac{s(s+0.1)(s+10) - (s+0.3)(3s^2+20s+0.2s+1)}{[s(s+0.1)(s+10)]^2} \\
+    0 &= s(s+0.1)(s+10) - (s+0.3)(3s^2+20.2s+1) \\
+    0 &= -2s^3 -11s^2 -6.06s -0.3 \\
+    s_1 &= -4.88616 \\
+    s_2 &= -0.0549265 \\
+    s_3 &= -0.558009
+\end{align*}
+Έτσι:
+\begin{itemize}
+    \item Το σημείο $s_1$ είναι το σημείο από το οποίο οι πόλοι -0.1 και -10 αναχωρούν προς τις δύο ασύμπτωτες.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{figures/root_locus_s1.png}
+        \caption{Σημείο Απόσχισης $s_1$}
+        \label{fig:root_locus_s1}
+    \end{figure}
+    \item Το σημείο $s_2$ είναι το σημείο απόσχισης των πόλων 0 και -0.1. Διαγράφουν ελειψοειδή πορεία και συγκλίνουν στο σημείο $s_3$.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{figures/root_locus_s2.png}
+        \caption{Σημείο Απόσχισης $s_2$}
+        \label{fig:root_locus_s2}
+    \end{figure}
+    \item Το σημείο $s_3$ είναι το σημείο σύγκλισης των πόλων 0 και -0.1. Από εκεί ο πόλος 0 οδεύει προς το μηδενικό -0.3 και ο πόλος -0.1 οδεύει προς το σημείο απόσχισης $s_1$.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{figures/root_locus_s3.png}
+        \caption{Σημείο Σύγκλισης $s_3$}
+        \label{fig:root_locus_s3}
+    \end{figure}
+\end{itemize}
 \end{document}

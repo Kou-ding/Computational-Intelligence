@@ -6,5 +6,5 @@ assignment1: $(TEX_MAIN)
 	xelatex -pdf $(TEX_MAIN)
 
 clean:
-	latexmk -C $(TEX_MAIN)
+	latexmk -c $(TEX_MAIN)
 	rm -f *.bbl 

@@ -20,9 +20,9 @@ printSysInfo(Ac);
 
 %% Functions
 % Analyze closed loop system
-function viable = checkViability(A)
+function viable = checkViability(Ac)
     % Display step response information
-    info = stepinfo(A);
+    info = stepinfo(Ac);
     % disp(info);
 
     % Check if the system meets the specifications

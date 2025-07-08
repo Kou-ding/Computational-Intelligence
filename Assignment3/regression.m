@@ -1,6 +1,6 @@
 %% Regrssion TSK(Terrace Step Kink) Model
 % Load Dataset
-data = load('airfoil_self_noise.dat');
+data = load('Datasets/airfoil_self_noise.dat');
 
 % Split - Preprocess Data
 [trnData, chkData, tstData] = split_scale(data, 1);

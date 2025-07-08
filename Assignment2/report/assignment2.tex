@@ -1,0 +1,66 @@
+\documentclass[12pt]{report}
+
+% Languages and fonts
+\usepackage{polyglossia}
+\setdefaultlanguage{greek}
+\setotherlanguage{english}
+\usepackage{fontspec}
+\renewcommand{\thesection}{\arabic{section}} % Begin sections from 1
+\setmainfont{Times New Roman} % Set main font to Times New Roman
+
+% Images
+\usepackage{graphicx}
+\usepackage{float} % placement of figures
+
+% Math
+\usepackage{amsmath} % mathematica symbols 
+\usepackage{mathrsfs} % curly math letters
+\usepackage{amssymb} %more mathematical symbols
+\usepackage{gensymb} % degree symbol
+\usepackage{mathtools} % For \mathclap
+
+% Miscellaneous
+\usepackage{parskip} % Remove paragraph indentation
+\usepackage{enumitem} % For custom itemizes
+\usepackage{hyperref} % For hyperlinks and references
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=1\textwidth]{figures/auth_logo.png}
+    \end{figure}
+
+    \vspace{1cm}
+
+    \Huge
+    \textbf{2η Εργασία}
+
+    \vspace{2cm}
+    
+    Υπολογιστική Νοημοσύνη \\
+
+    \vspace{2cm}
+
+    \Large
+    Παπαδάκης Κωνσταντίνος Φώτιος \\
+    ΑΕΜ: 10371
+
+    \vfill
+
+    \large
+    Αριστοτέλειο Πανεπιστήμιο Θεσσαλονίκης \\
+    Τμήμα Ηλεκτρολόγων Μηχανικών και Μηχανικών Υπολογιστών \\
+    \today
+\end{center}
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\section{}
+
+\end{document}

@@ -49,7 +49,7 @@ function createViableckCSV()
             % Closed Loop System
             Ac = feedback(A, 1, -1);
 
-            % Insert viable  values for K and c
+            % Insert viable values for K and c
             if checkViability(Ac)
                 viableCK{iter}=[c, K];
                 iter = iter + 1;

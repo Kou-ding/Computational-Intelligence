@@ -160,7 +160,6 @@
     \sigma_A &= \frac{-9.8}{2} \\
     \sigma_A &= -4.9
 \end{align*}
-\section{Επιλογή Ασαφούς Ελεγκτή}
 
 Σημεία Σύγκλισης και Απόσχισης:
 \begin{align*}
@@ -197,4 +196,35 @@
         \label{fig:root_locus_s3}
     \end{figure}
 \end{itemize}
+
+\section{Επιλογή Ασαφούς Ελεγκτή}
+Ένας ασαφής ελεγκτής FZ-PI (Fuzzy PI Controller) προσδιορίζεται από ασαφείς κανόνες της μορφής:
+\begin{equation}
+    \label{eq:fuzzy_rule}
+    \text{IF } e(k) \text{ IS } A \text{ AND } \Delta e(k) \text{ IS } B \text{ THEN } \Delta u(k) \text{ IS } C
+\end{equation}
+,όπου τα A, B και C οι λεκτικές τιμές που αποδίδονται στα σφάλματα $e(k)$, $\Delta e(k)$ και $\Delta u(k)$ αντίστοιχα.
+\begin{equation}
+    \text{IF } e(k) \text{ IS Approximately Zero} \text{ AND } \Delta e(k) \text{ IS Positive Small} \text{ THEN } \Delta u(k) \text{ IS Positive Small}
+\end{equation}
+
+Στην προκειμένη περίπτωση οι λεκτικές τιμές του σήματος ελέγχου $\Delta u(k)$ είναι:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/fuzzy_rules.png}
+    \caption{Λεκτικές Τιμές Σήματος Ελέγχου $\Delta u(k)$}
+    \label{fig:fuzzy_rules}
+\end{figure}
+
+Η γενική μορφή του ελεγκτή FZ-PI είναι παρόμοια με αυτή του ελεγκτή PI:
+\begin{equation}
+    \label{eq:fuzzy_pi_controller}
+    \Delta u(k) = F{e(k), \Delta e(k)}
+\end{equation}
+\begin{equation}
+    \label{eq:pi_controller}
+    \Delta u(k) = K_P \cdot \Delta e(k) + K_I \cdot e(k)
+\end{equation}
+
+
 \end{document}

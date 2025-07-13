@@ -61,6 +61,49 @@
 
 \newpage
 
-\section{}
+\section{Εισαγωγή}
+
+\section{Διαχωρισμός δεδομένων}
+Ξεκινάμε διαχωρίζοντας τα δεδομένα μας σε τρία σύνολα.
+\begin{itemize}
+    \item \textbf{Train set:} Το σύνολο εκπαίδευσης (60\% των δεδομένων). Είναι το σύνολο με το οποίο εκπαιδεύουμε το μοντέλο μας.
+    \item \textbf{Checking/Validation set:} Το σύνολο επικύρωσης (20\% των δεδομένων). Πάνω σε αυτό ελέγχουμε αν τα διαμορφωμένα κατά την εκπαίδευση βάρη είναι ικανά να γενικευτούν σε νέα δεδομένα. 
+    \item \textbf{Test set:} Το σύνολο ελέγχου (20\% των δεδομένων). Με αυτό υπολογίζουμε την απόδοση του μοντέλου μας.
+\end{itemize}
+
+\section{Εκπαίδευση}
+Κατά την εκπαίδευση των μοντέλων μας χρησιμοποιούμε τον παρακάτω πίνακα μέσω του οποίου αναθέτουμε διαφορετικό αριθμό συναρτήσεων συμμετοχής και διαφορετική μορφή εξόδου ανά μοντέλο.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Μοντέλο} & \textbf{Συναρτήσεις συμμετοχής} & \textbf{Μορφή εξόδου} \\
+        \hline
+        TSK\_model\_1 & 2 & Singleton (constant) \\
+        TSK\_model\_2 & 3 & Singleton (constant) \\
+        TSK\_model\_3 & 2 & Polynomial (linear) \\
+        TSK\_model\_4 & 3 & Polynomial (linear) \\
+        \hline
+    \end{tabular}
+    \caption{Πίνακας μοντέλων}
+    \label{tab:models}
+\end{table}
+
+Η εκτίμηση της απόδοσης των μοντέλων γίνεται μέσω των μετρικών RMSE (Root Mean Square Error) και R² (Coefficient of Determination). 
+\begin{equation}
+    RMSE = \sqrt{\sum_{i=1}^{N} (y_i - \hat{y}_i)^2}
+    \label{eq:rmse}
+\end{equation}
+
+\begin{equation}
+    R^2 = 1 - \frac{\sum_{i=1}^{N} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}
+    \label{eq:r2}
+\end{equation}
+
+\begin{equation}
+    
+    \label{eq:nmse}
+\end{equation}
+όπου $y_i$ είναι η πραγματική έξοδος, $\hat{y}_i$ η προβλεπόμενη έξοδος, $\bar{y}$ ο μέσος όρος των πραγματικών εξόδων και $N$ το πλήθος των παρατηρήσεων.
 
 \end{document}

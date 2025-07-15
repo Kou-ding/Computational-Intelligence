@@ -89,21 +89,121 @@
     \label{tab:models}
 \end{table}
 
-Η εκτίμηση της απόδοσης των μοντέλων γίνεται μέσω των μετρικών RMSE (Root Mean Square Error) και R² (Coefficient of Determination). 
+Η εκτίμηση της απόδοσης των μοντέλων γίνεται μέσω των μετρικών RMSE (Root Mean Square Error), NMSE (Normalized Mean Squared Error), NDEI (Normalized Data Error Index) και R² (Coefficient of Determination). 
 \begin{equation}
-    RMSE = \sqrt{\sum_{i=1}^{N} (y_i - \hat{y}_i)^2}
+    MSE = \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
+    \label{eq:mse}
+\end{equation}
+\begin{equation}
+    RMSE = \sqrt{MSE}
     \label{eq:rmse}
 \end{equation}
-
 \begin{equation}
     R^2 = 1 - \frac{\sum_{i=1}^{N} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{N} (y_i - \bar{y})^2}
     \label{eq:r2}
 \end{equation}
-
 \begin{equation}
-    
+    NMSE = \frac{MSE}{\sum_{i=1}^{N} (y_i - \bar{y})^2}
     \label{eq:nmse}
 \end{equation}
+\begin{equation}
+    NDEI = \sqrt{NMSE}
+    \label{eq:ndei}
+\end{equation}
 όπου $y_i$ είναι η πραγματική έξοδος, $\hat{y}_i$ η προβλεπόμενη έξοδος, $\bar{y}$ ο μέσος όρος των πραγματικών εξόδων και $N$ το πλήθος των παρατηρήσεων.
+
+\section{Αποτελέσματα}
+Ακολουθούν οι γραφικές παραστάσεις των learning curves και των συναρτήσεων συμμετοχής για κάθε είσοδο του dataset μας.
+% Model 1
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/model1plotLearningCurve.png}
+    \caption{Learning Curve - TSK\_model\_1}
+    \label{fig:learning_curve_1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/model1plotmf.png}
+    \caption{Συναρτήσεις συμμετοχής - TSK\_model\_1}
+    \label{fig:membership_functions_1}
+\end{figure}
+
+% Model 2
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/model2plotLearningCurve.png}
+    \caption{Learning Curve - TSK\_model\_2}
+    \label{fig:learning_curve_2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/model2plotmf.png}
+    \caption{Συναρτήσεις συμμετοχής - TSK\_model\_2}
+    \label{fig:membership_functions_2}
+\end{figure}
+
+% Model 3
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/model3plotLearningCurve.png}
+    \caption{Learning Curve - TSK\_model\_3}
+    \label{fig:learning_curve_3}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/model3plotmf.png}
+    \caption{Συναρτήσεις συμμετοχής - TSK\_model\_3}
+    \label{fig:membership_functions_3}
+\end{figure}
+
+% Model 4
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/model4plotLearningCurve.png}
+    \caption{Learning Curve - TSK\_model\_4}
+    \label{fig:learning_curve_4}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/model4plotmf.png}
+    \caption{Συναρτήσεις συμμετοχής - TSK\_model\_4}
+    \label{fig:membership_functions_4}
+\end{figure}
+
+Στη συνέχεια ακολουθεί ο πίνακας με τις μετρικές απόδοσης των μοντέλων μας.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \textbf{Μοντέλο} & \textbf{Χρόνος εκπαίδευσης (s)} & \textbf{RMSE} & \textbf{NMSE} & \textbf{NDEI} & $\mathbf{R^2}$ \\
+        \hline
+        TSK\_model\_1 & 0.87016 & 3.8397 & 0.3379 & 0.58129 & 0.99888 \\
+        TSK\_model\_2 & 8.7397 & 3.5005 & 0.28084 & 0.52994 & 0.99907 \\
+        TSK\_model\_3 & 3.2903 & 2.6932 & 0.16623 & 0.40771 & 0.99945 \\
+        TSK\_model\_4 & 179.4 & 3.9961 & 0.36598 & 0.60496 & 0.99878 \\
+        \hline
+    \end{tabular}
+    \caption{Πίνακας αποτελεσμάτων εκπαίδευσης}
+    \label{tab:results}
+\end{table}
+
+\section{Συμπεράσματα}
+\subsection{Χρόνος εκπαίδευσης}
+Παρατηρείται αύξηση του χρόνου εκπαίδευσης όταν:
+\begin{itemize}
+    \item Αυξάνεται ο αριθμός των συναρτήσεων συμμετοχής.
+    \item Αυξάνεται η πολυπλοκότητα της μορφής εξόδου (από σταθερή σε πολυωνυμική).
+\end{itemize}
+Ιδιαίτερα στην περίπτωση του μοντέλου TSK\_model\_4, ο χρόνος εκπαίδευσης είναι σημαντικά μεγαλύτερος σε σέση με όλα τα υπόλοιπα μοντέλα 
+
+\subsection{Μορφή εξόδου}
+Η μορφή εξόδου επηρεάζει 
+
+\subsection{Διαμέριση χώρου εισόδου}
+
+
+\subsection{Υπερ-εκπαίδευση}
+Και στα τέσσερα μοντέλα το σφάλμα εκπαίδευσης είναι μικρότερο από το σφάλμα επικύρωσης δεν παρατηρούμε ακόμα ιδιαίτερη υπερ-εκπαίδευση όμως αξίζει να σημειωθεί η αύξηση του Validation error στο μοντέλο TSK\_model\_3, με την πάροδο των εποχών. Σε αυτή τη περίπτωση το μοντέλο μας εξειδικεύεται στα δεδομένα εκπαίδευσης οδηγώντας σε αύξηση του σφάλματος επικύρωσης.
+
 
 \end{document}

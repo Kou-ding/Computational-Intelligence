@@ -31,30 +31,32 @@ for i = 1:size(models,1)-1
     fprintf('MFs per input: %d | Output type: %s\n', numMFs, outType);
 
     % Generate FIS (Fuzzy Inference System)
-    opt = genfisOptions('GridPartition');
+    genopt = genfisOptions('GridPartition');
     % Number of membership functions
-    opt.NumMembershipFunctions = numMFs;
+    genopt.NumMembershipFunctions = numMFs;
     % Bell shaped membership functions
-    opt.InputMembershipFunctionType = 'gbellmf';
+    genopt.InputMembershipFunctionType = 'gbellmf';
     % Output membership function type
-    opt.OutputMembershipFunctionType = outType;
+    genopt.OutputMembershipFunctionType = outType;
 
     % Generate initial FIS
-    init_fis = genfis(trnData(:,1:end-1), trnData(:,end), opt);
+    inFIS = genfis(trnData(:,1:end-1), trnData(:,end), genopt);
 
     % ANFIS (Adaptive Neuro Fuzzy Inference System)
+    % Set ANFIS options
+    opt = anfisOptions(...
+        'InitialFIS', inFIS, ... % Initial FIS
+        'EpochNumber', epochs, ... % Number of epochs
+        'ValidationData', chkData);  % Validation data
+
     % Generates a single-output Sugeno fuzzy inference system (FIS)
-    [fis, trainError, ~, valfis, valError] = anfis(trnData, init_fis, epochs, [0 0 0 0], chkData, 2);
-    
-    % If chkFIS is invalid, fallback
-    if ~isfis(chkFIS)
-        chkFIS = fis;
-    end
+    [fis, trainError, stepSize, chkFIS, chkError] = anfis(trnData, opt);
 
     % Evaluation
-    y_pred = evalfis(chkFIS, tstData(:,1:end-1));
-    y_true = tstData(:,end);
-    error = y_true - y_pred;
+    y_pred = evalfis(chkFIS, tstData(:,1:end-1)); % all columns except last
+    y_true = tstData(:,end); % last column
+    test_error = y_true - y_pred;
+    test_rmse = sqrt(mean(test_error.^2));
 
     % Performance metrics
     mse = mean(error.^2); % Mean Squared Error
@@ -81,32 +83,16 @@ for i = 1:size(models,1)-1
         grid on;
     end
 
-    % Plot 2: Learning Curve
+    % Plot 2-3: Learning Curve
     figure('Name', [model_name ' - Learning Curve']);
-    plot(trainError, 'b', 'LineWidth', 1.5); hold on;  % Add hold on here
-    plot(valError, 'r--', 'LineWidth', 1.5);
+    plot(test_rmse, 'b', 'LineWidth', 1.5); hold on;  % Add hold on here
+    plot(chkError, 'r--', 'LineWidth', 1.5);
     title(['Learning Curve - ' model_name]);
     xlabel('Epoch');
     ylabel('RMSE');
-    legend('Training Error', 'Validation Error');
+    legend('Test Error', 'Validation Error');
     grid on;
 
-    % Plot 3: Prediction Error
-    figure('Name', [model_name ' - Prediction Errors']);
-    subplot(2,1,1);
-    plot(y_true, 'b'); hold on;
-    plot(y_pred, 'r--');
-    title(['True vs Predicted - ' model_name]);
-    legend('True', 'Predicted');
-    ylabel('Sound Pressure (dB)');
-    grid on;
-
-    subplot(2,1,2);
-    plot(error, 'k');
-    title('Prediction Error');
-    xlabel('Sample Index');
-    ylabel('Error (dB)');
-    grid on;
 end
 
 % Display Final Results Table

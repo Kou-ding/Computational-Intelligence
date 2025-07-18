@@ -66,6 +66,12 @@ for nf = numFeaturesList
         end
     end
 end
+% Plots regarding all models
+% Plot error vs number of rules
+figure;
+
+% Plot error vs number of features
+figure;
 
 % Display best parameters
 fprintf('Best Parameters -> Features: %d, Radius: %.2f, CV-RMSE: %.4f\n', ...
@@ -87,5 +93,15 @@ finalFis = anfis([trnX_sel trnY], fis, 100);
 % Predict on Test Set
 Ypred_test = evalfis(finalFis, tstX_sel);
 rmse_test = sqrt(mean((Ypred_test - tstY).^2));
+
+% Plots regarding the optimal model
+% Plot real vs predicted values
+figure;
+
+% Plot error vs iterations
+figure;
+
+% Display table including RMSE, NMSE, NDEI, R^2
+fprintf('###### Performance metrics ######\n');
 
 fprintf('Final RMSE on test set: %.4f\n', rmse_test);

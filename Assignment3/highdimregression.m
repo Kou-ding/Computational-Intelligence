@@ -1,4 +1,4 @@
-%% Regrssion (Takagi Sugeno Kang) Model
+%% High demensionality Dataset Regression TSK(Takagi Sugeno Kang) Model
 % Load Dataset
 data = load('Datasets/superconduct.csv');
 

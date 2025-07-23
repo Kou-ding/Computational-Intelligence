@@ -119,14 +119,10 @@ rules = [
 
 fis = addRule(fis, rules);
 
-% Set implication and aggregation methods
-% Larsen operator
-% ALSO by using min
-% max-min synthesis operator
-% Defuzzification method: COA (Center of Area)
-fis.ImplicationMethod = 'min'; % Larsen operator (using min)
-fis.AggregationMethod = 'max'; % max-min synthesis
-fis.DefuzzificationMethod = 'centroid'; % COA (Center of Area)
+% Set implication, aggregation and defuzzification methods
+fis.ImplicationMethod = 'prod'; % Larsen implication
+fis.AggregationMethod = 'max'; % max-min aggregation, ALSO through max
+fis.DefuzzificationMethod = 'centroid'; % Defuzzification method COA (Center of Area)
 
 %% Visualize the membership functions
 figure('Name', 'Membership Functions', 'Position', [200 50 800 600]);

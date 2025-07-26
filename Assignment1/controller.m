@@ -1,4 +1,4 @@
-%% Main
+%% PI Controller
 % Mark s as a transfer function variable
 s = tf('s');
 
@@ -18,6 +18,8 @@ plotRootLocus(A);
 % System Information about the Closed Loop Transfer Function
 printSysInfo(Ac);
 
+% Step Response to r = 50*stepfun signal
+plotStepResponse(Ac);
 %% Functions
 % Analyze closed loop system
 function viable = checkViability(Ac)
@@ -128,4 +130,21 @@ function printSysInfo(A)
     fprintf('\nRoot Locus Gain\n');
     fprintf('-----------------\n');
     fprintf('Gain: %.4f\n\n', k);
+end
+
+% Plot system response to r = 50*stepfun signal
+function plotStepResponse(Ac)
+    figure;
+    % Create time vector
+    t = 0:0.01:10;  % 10 seconds with 0.01s resolution
+    % Generate step response with magnitude 50
+    [y, t] = step(50*Ac, t);
+    
+    % Plot the response
+    plot(t, y, 'b-', 'LineWidth', 2);yline(50, 'k--', 'LineWidth', 2);
+    grid on;
+    title('System Response to r = 50×u(t)');
+    xlabel('Time (seconds)');
+    ylabel('Output y(t)');
+    legend('Response', 'Reference');
 end

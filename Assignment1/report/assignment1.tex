@@ -198,21 +198,26 @@
 \end{itemize}
 
 \section{Επιλογή Ασαφούς Ελεγκτή}
+Η γενικότερη δομή ενός ασαφούς PI ελεγκτή είναι η εξής:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/fuzzy_pi.png}
+    \caption{Δομή Ασαφούς Ελεγκτή PI}
+    \label{fig:fuzzy_pi_controller}
+\end{figure}
+
 Ένας ασαφής ελεγκτής FZ-PI (Fuzzy PI Controller) προσδιορίζεται από ασαφείς κανόνες της μορφής:
 \begin{equation}
     \label{eq:fuzzy_rule}
     \text{IF } e(k) \text{ IS } A \text{ AND } \Delta e(k) \text{ IS } B \text{ THEN } \Delta u(k) \text{ IS } C
 \end{equation}
 ,όπου τα A, B και C οι λεκτικές τιμές που αποδίδονται στα σφάλματα $e(k)$, $\Delta e(k)$ και $\Delta u(k)$ αντίστοιχα.
-\begin{equation}
-    \text{IF } e(k) \text{ IS Approximately Zero} \text{ AND } \Delta e(k) \text{ IS Positive Small} \text{ THEN } \Delta u(k) \text{ IS Positive Small}
-\end{equation}
 
-Στην προκειμένη περίπτωση οι λεκτικές τιμές του σήματος ελέγχου $\Delta u(k)$ είναι:
+Στην προκειμένη περίπτωση οι λεκτικές τιμές των δύο εισόδων και της εξόδου παρουσιάζουν ίδιες συναρτήσεις συμμετοχής, όπως φαίνεται στο παρακάτω σχήμα:
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/fuzzy_rules.png}
-    \caption{Λεκτικές Τιμές Σήματος Ελέγχου $\Delta u(k)$}
+    \caption{Λεκτικές Τιμές Εισόδων και Εξόδου Ασαφούς Ελεγκτή}
     \label{fig:fuzzy_rules}
 \end{figure}
 

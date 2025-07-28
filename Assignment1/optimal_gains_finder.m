@@ -78,7 +78,6 @@ for K1_test = K1_range
             steady_state = w(end);
             max_output = max(y_test);
             overshoot_percent = ((max_output - steady_state) / steady_state) * 100;
-            
             rise_10_percent = 0.1 * steady_state;
             rise_90_percent = 0.9 * steady_state;
             rise_start_idx = find(y_test >= rise_10_percent, 1, 'first');
@@ -109,7 +108,8 @@ for K1_test = K1_range
 end
 
 % Display results
-fprintf('\n=== Optimization Results ===\n');
+fprintf('\nOptimization Results\n');
+fprintf('--------------------\n');
 if ~isempty(valid_solutions)
     fprintf('Found %d valid solutions!\n', size(valid_solutions, 1));
     fprintf('\nBest Parameters:\n');
@@ -117,16 +117,7 @@ if ~isempty(valid_solutions)
     fprintf('Resulting Performance:\n');
     fprintf('Overshoot: %.2f%% (target: <%.1f%%)\n', best_overshoot, max_overshoot);
     fprintf('Rise Time: %.4f s (target: <%.2fs)\n', best_rise_time, max_rise_time);
-    
-    % Update parameters for final simulation
-    K1 = best_params.K1;
-    Ke = best_params.Ke;
-    Kd = best_params.Kd;
-    
-    fprintf('\nParameters updated for final simulation.\n');
 else
     fprintf('No valid solutions found with current parameter ranges.\n');
     fprintf('Consider expanding the search ranges or relaxing the constraints.\n');
 end
-
-fprintf('\n=== Running Final Simulation with Best Parameters ===\n');

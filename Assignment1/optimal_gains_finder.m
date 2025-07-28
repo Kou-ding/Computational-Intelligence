@@ -1,4 +1,4 @@
-%% Fuzzy PI Controller
+%% Fuzzy PI Controller - Gain Optimization
 addpath('Assignment1'); % Add the folder containing initFIS.m
 % Initialize the Fuzzy Inference System (FIS)
 fis = initFIS();
@@ -22,7 +22,6 @@ plant = c2d(plant, Ts, 'tustin'); % Continuous to discrete conversion
 total_time = 4; % Total simulation time in seconds
 t = 0:Ts:total_time; % Time resolution
 
-%% Parameter Optimization Loop
 % Define parameter ranges to search
 K1_range = 50:10:150;           % Fuzzy PI Gain range
 Ke_range = 0.001:0.0005:0.005;  % Error Gain range
@@ -62,6 +61,7 @@ for K1_test = K1_range
             u_test = zeros(size(t));
             e_scaled_test = zeros(size(t));
             de_scaled_test = zeros(size(t));
+            w = 50 * ones(size(t)); % Step input signal
             
             for k = 2:length(t)
                 e_test(k) = w(k) - y_test(k-1);
@@ -117,6 +117,12 @@ if ~isempty(valid_solutions)
     fprintf('Resulting Performance:\n');
     fprintf('Overshoot: %.2f%% (target: <%.1f%%)\n', best_overshoot, max_overshoot);
     fprintf('Rise Time: %.4f s (target: <%.2fs)\n', best_rise_time, max_rise_time);
+    fprintf('\nValid Solutions:\n');
+    fprintf('K1\tKe\tKd\tOvershoot(%%)\tRise Time(s)\n');
+    fprintf('----------------------------------------------------\n');
+    for i = 1:size(valid_solutions, 1)
+        fprintf('%.0f\t%.4f\t%.4f\t%.2f\t\t%.4f\n', valid_solutions(i, 1), valid_solutions(i, 2), valid_solutions(i, 3), valid_solutions(i, 4), valid_solutions(i, 5));
+    end
 else
     fprintf('No valid solutions found with current parameter ranges.\n');
     fprintf('Consider expanding the search ranges or relaxing the constraints.\n');

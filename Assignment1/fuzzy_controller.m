@@ -2,12 +2,16 @@
 
 clear; % clear variables 
 close all; % close figures
-clc; % clear command window
+%clc; % clear command window
 
 addpath('Assignment1'); % Add the folder containing initFIS.m
 
+% Rules Mode - Mode dependent FZ PI gains
+% Available modes: 'custom' or 'lectures'
+mode = 'custom';
+
 % Initialize the Fuzzy Inference System (FIS)
-fis = initFIS();
+fis = initFIS(mode);
 
 % Plot membership functions for inputs and output
 myPlotMf(fis);
@@ -61,23 +65,31 @@ for i=1:3
     fprintf('Running simulation for Signal %d...\n', i);
     
     % Run the simulation with the current signal
-    mySimulation(fis, sig, Ts, t, metrics);
+    mySimulation(fis, sig, Ts, t, metrics, mode);
 end
 
 
 %% Functions
 % Run the simulation for a particular reference signal
-function mySimulation(fis, w, Ts, t, metrics)
+function mySimulation(fis, w, Ts, t, metrics, mode)
     % Mark s as a transfer function variable
     s = tf('s');
 
     % Fuzzy PI Parameters
     K = 30; % Controller's Gain (Proportional Gain - Kp = 30)
     c = 0.3; % Controller's Zero (Integral Gain - Ki = 9)
-    Ke = 0.001; % Error Gain (0.002 also good value)
-    Kd = 0.0002; % dError Gain
-    K1 = 80; % Fuzzy PI Gain (90 also good value)
 
+    % Mode dependent FZ PI gains
+    if strcmp(mode, 'lectures')
+        Ke = 0.0015; % Error Gain
+        Kd = 0.0005; % dError Gain
+        K1 = 150; % Fuzzy PI Gain
+    elseif strcmp(mode, 'custom')
+        Ke = 0.001; % Error Gain
+        Kd = 0.0002; % dError Gain
+        K1 = 80; % Fuzzy PI Gain
+    end
+        
     % Plant
     % Initial Kp, Ki equal to the linear controller Kp = 30, Ki = 9
     plant = ((s+c)*K)/(s*(s+0.1)*(s+10));
@@ -114,13 +126,6 @@ function mySimulation(fis, w, Ts, t, metrics)
         % Simulate the plant output
         y_temp = lsim(plant, u(1:k), t(1:k));
         y(k) = y_temp(end);
-
-        % Debugging prints for the first few iterations
-        % if k<4
-        %     disp('| k | E | dE | E_scaled | dE_scaled | dU | U | y |');
-        %     disp('--------------------------------------------------');
-        %     fprintf('| %d | %.4f | %.4f | %.4f | %.4f | %.4f | %.4f | %.4f |\n\n', k, e(k), de(k), e_scaled(k), de_scaled(k), du, u(k), y(k));
-        % end
     end
     
     % Check if the Fuzzy controller surpasses the normal on the step response

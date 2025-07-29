@@ -1,5 +1,5 @@
 %% FIS (Fuzzy Inference System) Setup
-function fis = initFIS()
+function fis = initFIS(mode)
     % Mamdani Fuzzy Inference System (FIS)
     fis = mamfis('Name', 'FuzzyController');
     % AND is implemented through the min operator
@@ -29,20 +29,31 @@ function fis = initFIS()
     end
 
     % Preallocate Rule Base matrix 
-    rules = zeros(81,5); % 
+    rules = zeros(81,5);
+
     % Rule index
     index = 1;
-    for i = 1:9 % i = E
-        for j = 1:9 % j = dE
-            if j < 5  % Negative dE
-                out = max(1, i+j-6);  % Reduced aggressiveness
-            elseif j > 5  % Positive dE
-                out = min(9, i+j-4);  % Increased aggressiveness
-            else
-                out = max(min(10-i, 9), 1);  % Faster correction
+    if strcmp(mode, 'lectures')
+        for i = 1:9 % i = E
+            for j = 1:9 % j = dE
+                out = max(min((i+j-5),9),1);
+                rules(index,:) = [i j out 1 1]; % [E, dE, dU, weight, connection]
+                index = index + 1;
             end
-            rules(index,:) = [i j out 1 1]; % [E, dE, dU, weight, connection]
-            index = index + 1;
+        end
+    elseif strcmp(mode, 'custom')
+        for i = 1:9 % i = E
+            for j = 1:9 % j = dE
+                if j < 5  % Negative dE
+                    out = max(1, i+j-6); % Moderated aggressiveness
+                elseif j > 5  % Positive dE
+                    out = min(9, i+j-4); % Moderated aggressiveness
+                else
+                    out = max(min(10-i, 9), 1); % Faster correction
+                end
+                rules(index,:) = [i j out 1 1]; % [E, dE, dU, weight, connection]
+                index = index + 1;
+            end
         end
     end
     fis = addRule(fis,rules);

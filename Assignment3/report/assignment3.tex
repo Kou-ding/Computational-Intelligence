@@ -23,6 +23,7 @@
 \usepackage{parskip} % Remove paragraph indentation
 \usepackage{enumitem} % For custom itemizes
 \usepackage{hyperref} % For hyperlinks and references
+\usepackage{tcolorbox} % For colored boxes
 
 \begin{document}
 
@@ -207,13 +208,88 @@
 Και στα τέσσερα μοντέλα το σφάλμα εκπαίδευσης είναι μικρότερο από το σφάλμα επικύρωσης δεν παρατηρούμε ακόμα ιδιαίτερη υπερ-εκπαίδευση όμως αξίζει να σημειωθεί η αύξηση του Validation error στο μοντέλο TSK\_model\_3, με την πάροδο των εποχών. Σε αυτή τη περίπτωση το μοντέλο μας εξειδικεύεται στα δεδομένα εκπαίδευσης οδηγώντας σε αύξηση του σφάλματος επικύρωσης.
 
 \section{Εφαρμογή σε dataset με υψηλή διαστασιμότητα}
+Η εύρεση των πιο σημαντικών χαρακτηριστικών του dataset μας επιτρέπει να απλοποιήσουμε την διαδικασία της εκπαίδευσης έτσι ώστε να είναι εκτελέσιμη εντός ρεαλιστικού χρονικού πλαισίου. Μέσω της μεθόδου Relieff επιτυγχάνουμε να περιορίσουμε τον αριθμό των χαρακτηριστικών σε 5, 10, 15 και 20 αντίστοιχα, και σε κάθε περίπτωση δοκιμάζουμε διαφορετικές ακτίνες επιρροής των clusters. 
 
 \subsection{Ανάλυση προβλήματος}
+Το συγκεκριμένο πρόβλημα παλινδρόμησης χρησιμοποιεί το Superconductivity dataset απο το UCI Repository, το οποίο αποτελείται από 81 χαρακτηριστικά. Ο αριθμός αυτών των χαρακτηριστικών οδηγεί σε $2^81$ κανόνες στην περίπτωση που διαμερίζουμε το χώρο εισόδου σε δύο ασαφή σύνολα. Ετσι είναι αποθαρυντική η απόπειρα εργασίας πάνω στο μη προεπεξεργασμένο dataset. Για αυτό χρησιμοποιούμε τον αλγόριθμο Relieff, ο οποίος χρησιμοποιεί k-nearest-neighbors και επιστρέφει δύο πίνακες. Έναν με τα πιο σημαντικά χαρακτηριστικά και έναν με τα βάρη τους. Για αυτήν την θα αγνοήσουμε τα βάρη αξιοποιώντας μόνο τα σημαντικά χαρακτηριστικά.
 
 \subsection{Διαγράμματα όλων των μοντέλων}
+Διενεργώντας k-fold cross-validation σε όλους τους συνδυασμούς ακτίνας, αριθμού σημαντικών χαρακτηριστικών σχεδιάζουμε την τιμή του RMSE σε σχέση με τον αριθμό των σημαντικών χαρακτηριστικών(για δεδομένη ακτίνα).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/errorVSnum_features.png}
+    \caption{RMSE VS Number of Features}
+    \label{fig:errorVSnum_features}
+\end{figure}
+
+Έπειτα αναπαριστούμε τον αριθμό των κανόνων που προκύπτουν σε σχέση με τον αριθμό σημαντικών χαρακτηριστικών και την ακτίνα επιρροής των clusters.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/errorVSnum_rules.png}
+    \caption{RMSE VS Number of Rules}
+    \label{fig:errorVSnum_rules}
+\end{figure}
+Μέσω αυτής της διαδικασίας μπορούμε να προχωρήσουμε στην εκπαίδευση του μοντέλου με τις βέλτιστες παραμέτρους χαρακτηριστικών και ακτίνας.
+
+\begin{tcolorbox}[title=Results, colback=gray!50, colframe=black]
+Minimum RMSE: 14.1293 at Features: 20, Radius: 0.40
+\end{tcolorbox}
+
 
 \subsection{Διαγράμματα βέλτιστου μοντέλου}
+Η πρώτη γραφική παράσταση του βέλτιστου μοντέλου περιλαμβάνει την καμπύλη εκμάθησης με τα σφάλματα επικύρωσης και εκμάθησης.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/best_model_learning_curve_45.png}
+    \caption{Best Model Learning Curve}
+    \label{fig:best_model_learning_curve_45}
+\end{figure}
+Έπειτα μέσω ενός scatter plot αποσκοπούμε στην αποτίμηση του πόσο κοντά είναι οι πραγματικές τιμές σε σχέση με τις προβλέψεις.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/best_model_trueVSpredicted_scatter.png}
+    \caption{Best Model True Vs Predicted}
+    \label{fig:best_model_trueVSpredicted_scatter}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/best_model_trueVSpredicted.png}
+    \caption{Best Model True Vs Predicted}
+    \label{fig:best_model_trueVSpredicted}
+\end{figure}
+
+Στο τέλος του κώδικα, τυπώνουμε τις μετρικές απόδοσης του βέλτιστου μοντέλου. Αυτές είναι:
+\begin{tcolorbox}[title=Performance metrics, colback=gray!50, colframe=black]
+Final RMSE on test set: 15.2731 \\
+Final NMSE on test set: 0.1996 \\
+Final NDEI on test set: 0.4468 \\
+Final $R^2$ on test set: 0.8004 \\
+Final number of Rules: 10
+\end{tcolorbox}
+
+Συγκεκριμένα οι πληροφορίες που μας δίνουν αυτές οι μετρικές είναι:
+\begin{itemize}
+    \item \textbf{RMSE:} Οι προβλέψεις του μοντέλου αποκλίνουν κατά μέσο όρο 15.2731 μονάδες από τις πραγματικές τιμές. 
+    \item \textbf{NMSE:} Τι μοντέλο αδυνατεί να εξηγήσει το 19.96\% της διακύμανσης των δεδομένων.
+    \item \textbf{NDEI:} Η αναλογία του RMSE προς την τυπική απόκλιση των δεδομένων. Η τιμή $0.4468$, δείχνει ότι το μέσο σφάλμα του μοντέλου ειναι 44.68\% της τυπικής απόκλισης των δεδομένων. Έτσι παρατηρούμε ότι το σφάλμα είναι σχετικά μικρό σε σχέση με την μεγάλη διακύμανση των δεδομένων και συνεπώς το μοντέλο έχει καλή απόδοση.
+    \item \textbf{R²:} Το μοντέλο εξηγεί το 80.04\% της διακύμανσης των δεδομένων.
+\end{itemize}
+
+Τέλος δοκιμάσαμε να αυξήσουμε τις εποχές (από 45 -> 100) για να δούμε αν το μοντέλο μας οδηγείται σε over-fitting.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/best_model_learning_curve_100.png}
+    \caption{Best Model Learning Curve - Extended}
+    \label{fig:best_model_learning_curve_100}
+\end{figure}
+Μπορούμε ξεκάθαρα να δούμε ότι κοντά στις 70 εποχές, ενώ το training error μειώνεται ομαλά το validation error δείχνει ορατή αστάθεια και σημαντική αύξηση ανά περιόδους που οφείλεται στην υπερ-εξειδίκευση του μοντέλου στα training data και την αδυναμία γενίκευσης.
 
 \subsection{Σχολιασμός αποτελεσμάτων}
+Ως επί των πλείστων η αύξηση του αριθμού των χαρακτηριστικών οδηγεί στην μείωση του σφάλματος. Εξαίρεση αποτέλεσε η ακτίνα 0.2 η οποία έδειχνε να επωφελείται είτε από πολύ λίγα χαρακτηριστικά είτε από πολλά χαρακτηριστικά, χάνοντας ευστοχία στις ενδιάμεσες τιμές.
+
+Γενικά τα αποτελέσματα έδειξαν ότι στο μικρότερο σφάλμα οδηγούμαστε με μεσαίο αριθμό κανόνων, κοντά στους 10. Όμως αν και οι 10 κανόνες σημείωσαν το ελάχιστο RMSE, οι 5 κανόνες ήταν σταθερά χαμηλά σε αντίθεση με τους 10 των οποίων η διακύμαση ήταν μεγαλύτερη.
+
+Τέλος, στην περίπτωση που θέλαμε να προσεγγίσουμε το συγκεκριμένο πρόβλημα με grid partitioning 
 
 \end{document}

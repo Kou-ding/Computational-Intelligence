@@ -58,6 +58,10 @@ for feature_index = 1:length(num_features_list)
             kfold_trnY = trnY(cv.training(i));
             kfold_chkX = selected_trnX(cv.test(i), :);
             kfold_chkY = trnY(cv.test(i));
+
+            % Clip values to the range [0, 1]
+            kfold_trnX = min(max(kfold_trnX, 0), 1);
+            kfold_chkX = min(max(kfold_chkX, 0), 1);
             
             % Generate FIS from the selected number of features and radius
             % Uses subtractive clustering and the range of influence of the cluster centers is equal to radius_list(radius_index)
@@ -127,6 +131,10 @@ final_trnX = trnX(:, final_Idx);
 final_chkX = chkX(:, final_Idx);
 final_tstX = tstX(:, final_Idx);
 
+% Clip values to the range [0, 1]
+final_trnX = min(max(final_trnX, 0), 1);
+final_chkX = min(max(final_chkX, 0), 1);
+final_tstX = min(max(final_tstX, 0), 1);
 
 options = genfisOptions('SubtractiveClustering', 'ClusterInfluenceRange', best_radius);
 inFIS = genfis(final_trnX, trnY, options);
@@ -143,7 +151,7 @@ opt = anfisOptions(...
 [fis, trainError, stepSize, chkFIS, chkError] = anfis([final_trnX trnY], opt);
 
 % Predict on Test Set
-Ypred_test = evalfis(fis, final_tstX);
+Ypred_test = evalfis(chkFIS, final_tstX);
 rmse_test = sqrt(mean((Ypred_test - tstY).^2));
 error = tstY - Ypred_test;
 
@@ -168,7 +176,6 @@ axis equal;
 xlim([min(tstY), max(tstY)]);
 ylim([min(tstY), max(tstY)]);
 
-
 % Plot error vs iterations
 figure;
 plot(trainError, 'b', 'LineWidth', 1.5); hold on;
@@ -185,3 +192,4 @@ fprintf('Final RMSE on test set: %.4f\n', rmse);
 fprintf('Final NMSE on test set: %.4f\n', nmse);
 fprintf('Final NDEI on test set: %.4f\n', ndei);
 fprintf('Final R^2 on test set: %.4f\n', r2);
+fprintf('Final number of Rules: %2d\n', length(chkFIS.rule));

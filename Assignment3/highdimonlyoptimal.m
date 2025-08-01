@@ -71,4 +71,4 @@ fprintf('Final RMSE on test set: %.4f\n', rmse);
 fprintf('Final NMSE on test set: %.4f\n', nmse);
 fprintf('Final NDEI on test set: %.4f\n', ndei);
 fprintf('Final R^2 on test set: %.4f\n', r2);
-fprintf('Final number of Rules: %2d\n', length(chkFIS.rule));
+fprintf('Final number of Rules: %d\n', length(chkFIS.rule));

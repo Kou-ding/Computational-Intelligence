@@ -1,4 +1,7 @@
 %% Classification TSK(Takagi Sugeno Kang) Model
+clear; % clear variables
+close all; % close figures
+
 % Load Dataset
 data = load('Datasets/haberman.data'); % 3 attributes, 1 label (4 columns)
 
@@ -6,7 +9,7 @@ data = load('Datasets/haberman.data'); % 3 attributes, 1 label (4 columns)
 rng(0);
 
 % Split - Preprocess Data
-addpath('Assignment3');
+addpath('Assignment4');
 [trnData, chkData, tstData] = split_scale(data, 1);
 
 %  Extract features and labels
@@ -100,7 +103,12 @@ for i=1:length(cluster_radius)
 
     % Plot the fuzzy set after training
     figure;
+    subplot(1, 3, 1);
     plotmf(chkFIS, 'input', 1); % Plot membership functions for the first input
+    subplot(1, 3, 2);
+    plotmf(chkFIS, 'input', 2); % Plot membership functions for the second input
+    subplot(1, 3, 3);
+    plotmf(chkFIS, 'input', 3); % Plot membership functions for the third input
     title(sprintf('Fuzzy Set after Training (Cluster Radius: %.2f)', cluster_radius(i)));
     xlabel('Input Value');
     ylabel('Membership Degree');
@@ -122,6 +130,7 @@ for i=1:length(cluster_radius)
     error_matrix = zeros(2, 2);
     % Round predicted class to the nearest integer
     Y_pred_test = round(Y_pred_test);
+    disp(Y_pred_test);
     for k = 1:length(Y_pred_test)
         if Y_pred_test(k) == 1 && tstY(k) == 1
             error_matrix(1,1) = error_matrix(1,1) + 1; % True Positive
@@ -148,6 +157,8 @@ for i=1:length(cluster_radius)
     end
     fprintf('Cluster Radius: %.2f\n', cluster_radius(i));
     fprintf('Number of Rules: %d\n', num_rules);
+    fprintf('Error Matrix:\n');
+    disp(error_matrix);
     fprintf('Overall Accuracy (OA): %.4f\n', OA);
     fprintf("Producer\'s Accuracy (PA): %.4f, %.4f\n", PA(1), PA(2));
     fprintf("User\'s Accuracy (UA): %.4f, %.4f\n", UA(1), UA(2));

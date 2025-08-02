@@ -117,6 +117,9 @@ for i=1:length(cluster_radius)
             'DisplayANFISInformation', 0); % Don't display ANFIS information
         % Train the model
         [fis, trainError, stepSize, chkFIS, chkError] = anfis(trnData,opt);
+
+        % Evaluate the model on the test set
+        Y_pred_test = evalfis(chkFIS, tstX);
     end
 
     % Plot the fuzzy set after training
@@ -146,18 +149,21 @@ for i=1:length(cluster_radius)
     % Columns: Real, Rows: Predicted (Diagonal->True Positives)
     % Generate error matrix 2x2 - Class 1: y=1, Class 2: y=2
     error_matrix = zeros(2, 2);
-    % Round predicted class to the nearest integer
-    Y_pred_test = round(Y_pred_test);
+
     for k = 1:length(Y_pred_test)
-        if Y_pred_test(k) == 1 && tstY(k) == 1
-            error_matrix(1,1) = error_matrix(1,1) + 1; % True Positive
-        elseif Y_pred_test(k) == 1 && tstY(k) == 2
-            error_matrix(1,2) = error_matrix(1,2) + 1; % False Positive
-        elseif Y_pred_test(k) == 2 && tstY(k) == 1
-            error_matrix(2,1) = error_matrix(2,1) + 1; % False Negative
-        elseif Y_pred_test(k) == 2 && tstY(k) == 2
-            error_matrix(2,2) = error_matrix(2,2) + 1; % True Negative
+        % Round predicted class to the nearest integer
+        predicted = round(Y_pred_test(k));
+        actual = tstY(k);
+
+        % Keep within class limits
+        if predicted < 1
+            predicted = 1; % Ensure minimum class is 1
+        elseif predicted > 2
+            predicted = 2; % Ensure maximum class is 2
         end
+        
+        % Update error matrix
+        error_matrix(predicted, actual) = error_matrix(predicted, actual) + 1;
     end
 
     % Performance metrics
@@ -180,5 +186,4 @@ for i=1:length(cluster_radius)
     fprintf("Producer\'s Accuracy (PA): %.4f, %.4f\n", PA(1), PA(2));
     fprintf("User\'s Accuracy (UA): %.4f, %.4f\n", UA(1), UA(2));
     fprintf('K_hat: %.4f\n\n', K_hat);
-    
 end

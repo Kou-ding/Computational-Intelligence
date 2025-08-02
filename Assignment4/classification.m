@@ -58,47 +58,65 @@ for i=1:length(cluster_radius)
         Y_pred_test = evalfis(chkFIS, tstX);
     elseif i == 3 || i == 4
         classes = [1, 2]; % Dataset classes: Class 1: y=1, Class 2: y=2
-        fis_array = cell(length(classes), 1); % Cell array to store FIS for each class
-
-        for j = 1:length(classes)
-            % Extract data for current class
-            class_mask = (trnY == classes(j));
-            class_data_X = trnX(class_mask, :);
-            class_data_Y = trnY(class_mask);
-            
-            % Apply subtractive clustering to this class
-            options = genfisOptions('SubtractiveClustering', 'ClusterInfluenceRange', cluster_radius(i));
-            
-            % Generate FIS for this class
-            class_fis = genfis(class_data_X, class_data_Y, options);
-            
-            % Store the FIS for this class
-            fis_array{j} = class_fis;
-        end
-        % Create combined FIS structure starting with first class
-        combined_fis = fis_array{1};
-        % Add rules from second class
-        combined_fis = addRule(combined_fis, fis_array{2});
-
+        % subclust
+        % args: data, radius
+        % returns: cluster centers, sigmas
+        [c1,sig1]=subclust(trnData(tstY==1,:),cluster_radius(i)); % data: samples where label is 1
+        [c2,sig2]=subclust(trnData(tstY==2,:),cluster_radius(i)); % data: samples where label is 2
+        disp(['sig1 size: ', num2str(size(sig1))]);
+        disp(['c1 size: ', num2str(size(c1))]);
+        disp(['sig2 size: ', num2str(size(sig2))]);
+        disp(['c2 size: ', num2str(size(c2))]);
         % Number of rules
-        num_rules = length(combined_fis.rule);
-        
+        num_rules = size(c1,1) + size(c2,1);
+
+        % Build FIS From Scratch
+        fis=sugfis('Name','FIS_SC');
+
+        % Add Input-Output Variables
+        names_in={'in1','in2','in3'};
+        for j=1:size(trnData,2)-1
+            fis=addInput(fis,[0 1],'Name',names_in{j});
+        end
+        fis=addOutput(fis,[0 1],'Name','out1');
+
+        % Add Input Membership Functions
+        name='sth';
+        for j=1:size(trnData,2)-1
+            for k=1:size(c1,1)
+                fis=addMF(fis,names_in{j},'gaussmf',[sig1(j) c1(k,j)]);
+            end
+            for k=1:size(c2,1)
+                fis=addMF(fis,names_in{j},'gaussmf',[sig2(j) c2(k,j)]);
+            end
+        end
+
+        % Add Output Membership Functions
+        params=[zeros(1,size(c1,1)) ones(1,size(c2,1))];
+        for j=1:num_rules
+            fis=addMF(fis,'out1','constant',params(j));
+        end
+
+        % Add FIS Rule Base
+        ruleList=zeros(num_rules,size(trnData,2));
+        for j=1:size(ruleList,1)
+            ruleList(j,:)=j;
+        end
+        ruleList=[ruleList ones(num_rules,2)];
+        fis=addRule(fis,ruleList);
+
         % ANFIS (Adaptive Neuro Fuzzy Inference System)
         epochs = 50; % Number of epochs
         opt = anfisOptions(...
-            'InitialFIS', combined_fis, ... % Initial FIS
+            'InitialFIS', fis, ... % Initial FIS
             'EpochNumber', epochs, ... % Number of epochs
             'OptimizationMethod', 1, ... % Hybrid training: backpropagation to compute input membership function parameters, and least squares estimation to compute output membership function parameters
             'ValidationData', [chkX, chkY],... % Validation data
             'DisplayStepSize', 0,... % Don't display step size
             'DisplayErrorValues', 0,... % Don't display error values
             'DisplayANFISInformation', 0); % Don't display ANFIS information
-
         % Train the model
-        [fis, trainError, stepSize, chkFIS, chkError] = anfis([trnX, trnY], opt);
-
-        % Evaluate the model on the test set
-        Y_pred_test = evalfis(chkFIS, tstX);
+        [fis, trainError, stepSize, chkFIS, chkError] = anfis(trnData,opt);
     end
 
     % Plot the fuzzy set after training
@@ -130,7 +148,6 @@ for i=1:length(cluster_radius)
     error_matrix = zeros(2, 2);
     % Round predicted class to the nearest integer
     Y_pred_test = round(Y_pred_test);
-    disp(Y_pred_test);
     for k = 1:length(Y_pred_test)
         if Y_pred_test(k) == 1 && tstY(k) == 1
             error_matrix(1,1) = error_matrix(1,1) + 1; % True Positive

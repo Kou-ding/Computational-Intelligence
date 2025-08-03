@@ -27,12 +27,12 @@ tstY = tstData(:, end);
 % cluster size parameter should get extreme values to show change
 % Hybrid training: mf parameters are updated through backpropagation, output parameters are updated through least squares
 
-cluster_radius = [0.2, 0.8, 0.2, 0.8]; % Number of rules
+cluster_radius = [0.2, 0.4, 0.6, 0.8, 0.2, 0.4, 0.6, 0.8]; % Number of rules
 
 for i=1:length(cluster_radius) 
     fprintf('\n#### Model: %d ####\n', i);
     % Divide input space through Subtractive clustering 
-    if i == 1 || i == 2
+    if i <= length(cluster_radius)/2
         options = genfisOptions('SubtractiveClustering','ClusterInfluenceRange', cluster_radius(i));
 
         inFIS = genfis(trnX, trnY, options);
@@ -41,7 +41,7 @@ for i=1:length(cluster_radius)
         num_rules = length(inFIS.rule);
 
         % ANFIS (Adaptive Neuro Fuzzy Inference System)
-        epochs = 50; % Number of epochs
+        epochs = 100; % Number of epochs
         opt = anfisOptions(...
             'InitialFIS', inFIS, ... % Initial FIS
             'EpochNumber', epochs, ... % Number of epochs
@@ -56,17 +56,14 @@ for i=1:length(cluster_radius)
 
         % Evaluate the model on the test set
         Y_pred_test = evalfis(chkFIS, tstX);
-    elseif i == 3 || i == 4
+    else
         classes = [1, 2]; % Dataset classes: Class 1: y=1, Class 2: y=2
         % subclust
         % args: data, radius
         % returns: cluster centers, sigmas
         [c1,sig1]=subclust(trnData(tstY==1,:),cluster_radius(i)); % data: samples where label is 1
         [c2,sig2]=subclust(trnData(tstY==2,:),cluster_radius(i)); % data: samples where label is 2
-        disp(['sig1 size: ', num2str(size(sig1))]);
-        disp(['c1 size: ', num2str(size(c1))]);
-        disp(['sig2 size: ', num2str(size(sig2))]);
-        disp(['c2 size: ', num2str(size(c2))]);
+        
         % Number of rules
         num_rules = size(c1,1) + size(c2,1);
 
@@ -106,7 +103,7 @@ for i=1:length(cluster_radius)
         fis=addRule(fis,ruleList);
 
         % ANFIS (Adaptive Neuro Fuzzy Inference System)
-        epochs = 50; % Number of epochs
+        epochs = 100; % Number of epochs
         opt = anfisOptions(...
             'InitialFIS', fis, ... % Initial FIS
             'EpochNumber', epochs, ... % Number of epochs
@@ -126,11 +123,31 @@ for i=1:length(cluster_radius)
     figure;
     subplot(1, 3, 1);
     plotmf(chkFIS, 'input', 1); % Plot membership functions for the first input
+    if i <= length(cluster_radius)/2
+       title(sprintf('Fuzzy Set after Training (Cluster Radius: %.2f)\n Clustering Type: Class Independent', cluster_radius(i)));
+    else
+        title(sprintf('Fuzzy Set after Training (Cluster Radius: %.2f)\n Clustering Type: Class Dependent', cluster_radius(i)));
+    end
+    xlabel('Input Value');
+    ylabel('Membership Degree');
+    grid on;
     subplot(1, 3, 2);
     plotmf(chkFIS, 'input', 2); % Plot membership functions for the second input
+    if i <= length(cluster_radius)/2
+       title(sprintf('Fuzzy Set after Training (Cluster Radius: %.2f)\n Clustering Type: Class Independent', cluster_radius(i)));
+    else
+        title(sprintf('Fuzzy Set after Training (Cluster Radius: %.2f)\n Clustering Type: Class Dependent', cluster_radius(i)));
+    end
+    xlabel('Input Value');
+    ylabel('Membership Degree');
+    grid on;
     subplot(1, 3, 3);
     plotmf(chkFIS, 'input', 3); % Plot membership functions for the third input
-    title(sprintf('Fuzzy Set after Training (Cluster Radius: %.2f)', cluster_radius(i)));
+    if i <= length(cluster_radius)/2
+       title(sprintf('Fuzzy Set after Training (Cluster Radius: %.2f)\n Clustering Type: Class Independent', cluster_radius(i)));
+    else
+        title(sprintf('Fuzzy Set after Training (Cluster Radius: %.2f)\n Clustering Type: Class Dependent', cluster_radius(i)));
+    end
     xlabel('Input Value');
     ylabel('Membership Degree');
     grid on;
@@ -142,7 +159,11 @@ for i=1:length(cluster_radius)
     plot(chkError, 'r-', 'LineWidth', 2);
     xlabel('Epochs');
     ylabel('Error');
-    title(sprintf('Training and Validation Error (Cluster Radius: %.2f)', cluster_radius(i)));
+    if i <= length(cluster_radius)/2
+       title(sprintf('Training and Validation Error (Cluster Radius: %.2f)\n Clustering Type: Class Independent', cluster_radius(i)));
+    else
+        title(sprintf('Training and Validation Error (Cluster Radius: %.2f)\n Clustering Type: Class Dependent', cluster_radius(i)));
+    end
     legend('Training Error', 'Validation Error');
 
     % Error matrix kxk, where k=numofclasses 
@@ -173,9 +194,9 @@ for i=1:length(cluster_radius)
     K_hat = (sum(error_matrix(:)) * sum(diag(error_matrix)) - sum(sum(error_matrix, 1) .* sum(error_matrix, 2))) / (sum(error_matrix(:))^2 - sum(sum(error_matrix, 1) .* sum(error_matrix, 2)));
 
     % Display performance metrics
-    if i == 1 || i == 2
+    if i <= length(cluster_radius)/2
         fprintf('Clustering Type: Class Independent\n');
-    elseif i == 3 || i == 4
+    else
         fprintf('Clustering Type: Class Dependent\n');
     end
     fprintf('Cluster Radius: %.2f\n', cluster_radius(i));
